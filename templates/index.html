@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <p>Your permissions: {{ data3 | safe }}</p>
-    
     <title>רשימת תקלות</title>
     <style>
+        body {
+            direction: rtl;
+            text-align: right;
+        }
+
         table {
             border-collapse: collapse;
             width: 100%;
@@ -23,115 +26,137 @@
             background-color: #f2f2f2;
         }
 
-        #downloadBtn, #addEntryBtn {
+        #buttonContainer {
+            text-align: right;
             margin-top: 10px;
+        }
+
+        .actionButton {
             padding: 8px;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            margin-left: 5px;
         }
 
         #addEntryForm {
             display: none;
         }
+
+        #bottomButtonContainer {
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        #titlesContainer {
+            text-align: right;
+        }
     </style>
 </head>
 <body>
-    <form action="/See_permissions_table" method="get">
-        <button id="addEntryBtn" type="submit">See permissions table</button>
-    </form>
+    <!-- Titles Container -->
+    <div id="titlesContainer">
+        <h1>רשימת תקלות</h1>
+        <p>ההרשאות שלך: {{ data3 | safe }}</p>
+    </div>
+
+    <!-- Buttons Container -->
+    <div id="buttonContainer">
+        </br>
+        <form action="/See_permissions_table" method="get">
+            <button class="actionButton" type="submit">הצג הרשאות</button>
+        </form>
+        </br>
+        <form action="/entrance_permissions" method="get">
+            <button class="actionButton" type="submit">אשרות כניסה</button>
+        </form>
+        </br>
+        <button class="actionButton"> עדכון רשימות מובנות (זמין רק להרשאת מאסטר, בפיתוח)</button>
+        </br>
+        <form action="/" method="get">
+        </br>
+            <label for="issue">בחר סוג תקלה:</label>
+            <select name="issue" id="issue">
+                <option value="">כל התקלות</option>
+                {% for issue in unique_issues %}
+                    <option value="{{ issue }}" {% if issue == selected_issue %}selected{% endif %}>{{ issue }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="timeframe">בחר חלון זמן:</label>
+            <select name="timeframe" id="timeframe">
+                <option value="">כל הזמן</option>
+                {% for timeframe in unique_timeframes %}
+                    <option value="{{ timeframe }}" {% if timeframe == selected_timeframe %}selected{% endif %}>{{ timeframe }}</option>
+                {% endfor %}
+            </select>
+            
+            <button class="actionButton" type="submit">החל פילטר</button>
+        </br>
+        </form>
+    </div>
 </br>
-<form action="/entrance_permissions" method="get">
-    <button id="addEntryBtn" type="submit">entrance_permissions</button>
-</form>
-</br>
-    <button id="addEntryBtn" type="submit"> עדכון רשימות מובנות (זמין רק להרשאת מאסטר, בפיתוח)</button>
-</br>
-    <form action="/" method="get">
+    <!-- Table Container -->
+    <div id="tableContainer">
+        {% for table in tables %}
+            {{ table|safe }}
+        {% endfor %}
+    </div>
+
+    <!-- Buttons Container at the Bottom -->
+    <div id="bottomButtonContainer">
     </br>
-        <label for="issue">Select Issue Type:</label>
-        <select name="issue" id="issue">
-            <option value="">All Issues</option>
-            {% for issue in unique_issues %}
-                <option value="{{ issue }}" {% if issue == selected_issue %}selected{% endif %}>{{ issue }}</option>
-            {% endfor %}
-        </select>
+        <form action="/download" method="post">
+            <button class="actionButton" type="submit">ייצוא כקובץ אקסל</button>
+        </form>
+    </br>
+        <form action="/download_pdf" method="post">
+            <button class="actionButton" type="submit">PDF  ייצוא כקובץ </button>
+        </form>
+    </br>
+        <button class="actionButton" onclick="toggleForm()">הוסף רשומה</button>
+    </div>
 
-        <label for="timeframe">Select Timeframe:</label>
-        <select name="timeframe" id="timeframe">
-            <option value="">All Timeframes</option>
-            {% for timeframe in unique_timeframes %}
-                <option value="{{ timeframe }}" {% if timeframe == selected_timeframe %}selected{% endif %}>{{ timeframe }}</option>
-            {% endfor %}
-        </select>
- 								
-        <button type="submit">Apply Filters</button>
-    </form>
-    <h1>רשימת תקלות</h1>
-    {% for table in tables %}
-        {{ table|safe }}
-    {% endfor %}
-   
-
-    <!-- <form action="/See_permissions_table" method="post">
-        <button id="addEntryBtn" type="submit">See permissions table2</button>
-    </form> -->
-
-    <form action="/download" method="post">
-        <button id="downloadBtn" type="submit">ייצוא כקובץ אקסל</button>
-    </form>
-    <form action="/download_pdf" method="post">
-        <button id="downloadBtn" type="submit">PDF  ייצוא כקובץ </button>
-    </form>
-
-    <!-- <form action="/download_pdf" method="post">
-        <button id="downloadpdfBtn" type="submit">Download as PDF</button>
-    </form> -->
-    <button id="addEntryBtn" onclick="toggleForm()">Add Entry</button>
-
-        <!-- Other form fields go here -->
+    <!-- Other form fields go here -->
 
     </form>
+
     <form id="addEntryForm" method="post" action="/add_entry">
-        
         <label for="customer_name">לקוח:</label>
         <select id="customer_name" name="customer_name">
             {% for customer_name in unique_clients %}
                 <option value="{{ customer_name }}" {% if customer_name == selected_customer %}selected{% endif %}>{{ customer_name }}</option>
             {% endfor %}
         </select>
-        <form action="/" method="get">
-        </br>
-        <label for="location">בחר אתר:</label>
-        <select id="location" name="location">
-            {% for location in atarim %}
-                <option value="{{ location }}" {% if location == selected_location %}selected{% endif %}>{{ location }}</option>
-            {% endfor %}
-        </select>
-        </br>
-        <label for="issue_type">סמן סוג תקלה:</label>
-        <select id="issue_type" name="issue_type">
-            {% for issue_type in unique_issues %}
-                <option value="{{ issue_type }}" {% if issue_type == selected_issue_type %}selected{% endif %}>{{ issue_type }}</option>
-            {% endfor %}
-        </select>
-        </br>
-        <input type="text" name="serial_number" placeholder="מספר סידורי">
-        <input type="text" name="date_time" placeholder="תאריך +שעה">
-        <input type="text" name="description" placeholder="תיאור">
-        <input type="text" name="report_to" placeholder="דווח ל...">
-        <input type="text" name="call_number" placeholder="מס' קריאה">
-        <input type="text" name="treatment_completion" placeholder="סיום טיפול (סגירה)">
-        <input type="text" name="notes" placeholder="הערות">
-        <input type="text" name="event_closed_by" placeholder="מי סגר את האירוע">
-        </br>
-        </br>
-        <button type="submit">Add</button>
-    </form>
-    
 
+        <form action="/" method="get">
+            <label for="location">בחר אתר:</label>
+            <select id="location" name="location">
+                {% for location in atarim %}
+                    <option value="{{ location }}" {% if location == selected_location %}selected{% endif %}>{{ location }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="issue_type">סמן סוג תקלה:</label>
+            <select id="issue_type" name="issue_type">
+                {% for issue_type in unique_issues %}
+                    <option value="{{ issue_type }}" {% if issue_type == selected_issue_type %}selected{% endif %}>{{ issue_type }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="text" name="serial_number" placeholder="מספר סידורי">
+            <input type="text" name="date_time" placeholder="תאריך +שעה">
+            <input type="text" name="description" placeholder="תיאור">
+            <input type="text" name="report_to" placeholder="דווח ל...">
+            <input type="text" name="call_number" placeholder="מס' קריאה">
+            <input type="text" name="treatment_completion" placeholder="סיום טיפול (סגירה)">
+            <input type="text" name="notes" placeholder="הערות">
+            <input type="text" name="event_closed_by" placeholder="מי סגר את האירוע">
+
+            <button class="actionButton" type="submit">הוסף</button>
+        </form>
     <script>
         function toggleForm() {
             var form = document.getElementById("addEntryForm");
@@ -140,49 +165,3 @@
     </script>
 </body>
 </html>
-
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>רשימת תקלות</title>
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        th, td {
-            border: 1px solid #dddddd;
-            text-align: left;
-            padding: 8px;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        #downloadBtn {
-            margin-top: 10px;
-            padding: 8px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <h1>רשימת תקלות</h1>
-    {% for table in tables %}
-        {{ table|safe }}
-    {% endfor %}
-    
-    <form action="/download" method="post">
-        <button id="downloadBtn" type="submit">Download Table</button>
-    </form>
-</body>
-</html> -->

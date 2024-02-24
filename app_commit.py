@@ -12,9 +12,10 @@ app_commit.secret_key = b"_j'yXdW7.63}}b72"
 # app.secret_key = b"_j'yXdW7.63}}b72"
 
 # Read data from Excel file
-excel_file_path = "generated_records_with_restrictions_hebrew.xlsx"
+# excel_file_path = "generated_records_with_restrictions_hebrew_2.xlsx"
+excel_file_path = "generated_records_with_restrictions_hebrew_updated_by.xlsx"
 df = pd.read_excel(excel_file_path)[:40]
-
+print("here:::: ",df)
 entrance_data = "generated_entrance_details_from_list_4.xlsx"
 entrance_df = pd.read_excel(entrance_data)[:40]
 
@@ -382,6 +383,7 @@ def add_entry():
     treatment_completion = request.form.get("treatment_completion")
     notes = request.form.get("notes")
     event_closed_by = request.form.get("event_closed_by")
+    last_updated_by = session['username']
 
     # Add the new entry to the DataFrame
     new_entry = pd.DataFrame({
@@ -396,6 +398,7 @@ def add_entry():
         "סיום טיפול (סגירה)": [treatment_completion],
         "הערות": [notes],
         "מי סגר את האירוע": [event_closed_by],
+        "עודכן לאחרונה על ידי": [last_updated_by],
     })
 
     df = pd.concat([df, new_entry], ignore_index=True)
