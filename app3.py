@@ -3,6 +3,8 @@ import pandas as pd
 
 app = Flask(__name__)
 
+a={"אביגיל_יוסף", "נחמה_מזרחי","אלון_מלול","נעמי_עואד","בת שבע_שחר"}
+
 # Dummy DataFrame for demonstration
 data = {
     'Name': ['John', 'Alice', 'Bob', 'Eve'],
@@ -18,6 +20,8 @@ users = {
     'bob': {'password': 'pass789', 'role': 'User'},
     'eve': {'password': 'pass999', 'role': 'Guest'},
 }
+users_df = pd.read_excel("passwords_register30.xlsx")
+users_list = list(users_df.Username.unique())
 
 @app.route('/')
 def index():
@@ -27,11 +31,16 @@ def index():
 def login():
     username = request.form['username']
     password = request.form['password']
-
-    if username in users and users[username]['password'] == password:
+    print("THIS: ", list(users_df[users_df['Username']==username]['Password'])[0])#,type(list(users_df[users_df['Username']==username]['Password'])))
+    # if username in users_list and users[username]['password'] == password:
+    if username in users_list and list(users_df[users_df['Username']==username]['Password'])[0] == password:
+        
         # Valid login, set session variables
         session['username'] = username
-        session['role'] = users[username]['role']
+        print("THIS2",list(users_df[users_df['Username']==username]['Role'])[0])
+        session['role'] = list(users_df[users_df['Username']==username]['Role'])[0]
+        session['Client'] = list(users_df[users_df['Username']==username]['Client'])[0]
+        # session['role'] = users[username]['role']
         return redirect(url_for('dashboard'))
     else:
         return "Invalid login credentials. Please try again."
@@ -44,9 +53,12 @@ def dashboard():
         user_role = session['role']
 
         # Filter data based on user role
-        filtered_data = df[df['Role'] == user_role]
+        # filtered_data = df[df['Role'] == user_role]
+        passwords = pd.read_excel("passwords_register30.xlsx")#['']
+        filtered_data = pd.read_excel("permissions_df80.xlsx")
+        filtered_data_filtered = filtered_data[(filtered_data['Client']==session['Client']) & (filtered_data['Role']==session['role'])][['Site','Access']]#.set_index('Site')
 
-        return render_template('dashboard.html', username=username, data=filtered_data.to_html())
+        return render_template('dashboard.html', username=username, data1=filtered_data.to_html(),data2=passwords.to_html(), data3=filtered_data_filtered.to_html())
     else:
         return redirect(url_for('index'))
 

@@ -2,24 +2,226 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Permissions</title>
+    
+    <p>Your permissions: {{ data3 | safe }}</p>
+    
+    <title>רשימת תקלות</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        #downloadBtn, #addEntryBtn {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #addEntryForm {
+            display: none;
+        }
+    </style>
+
+        <!-- Include jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+        <script>
+            // Use jQuery to handle form submission asynchronously
+            $(document).ready(function () {
+                $('#checkPermissionForm').submit(function (event) {
+                    event.preventDefault(); // Prevent the default form submission
+    
+                    var idNumber = $('#id_number').val();
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: '/check_permission',
+                        data: { 'id_number': idNumber },
+                        success: function (result) {
+                            // Update the content on the page
+                            $('#resultContainer').html(result);
+                        },
+                        error: function (error) {
+                            console.error('Error:', error);
+                        }
+                    });
+                });
+            });
+        </script>
 </head>
 <body>
+</br>
+    <form action="/" method="get">
+    </br>
+        <label for="issue">Select Issue Type:</label>
+        <select name="issue" id="issue">
+            <option value="">All Issues</option>
+            {% for issue in unique_issues %}
+                <option value="{{ issue }}" {% if issue == selected_issue %}selected{% endif %}>{{ issue }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="timeframe">Select Timeframe:</label>
+        <select name="timeframe" id="timeframe">
+            <option value="">All Timeframes</option>
+            {% for timeframe in unique_timeframes %}
+                <option value="{{ timeframe }}" {% if timeframe == selected_timeframe %}selected{% endif %}>{{ timeframe }}</option>
+            {% endfor %}
+        </select>
+ 								
+        <button type="submit">Apply Filters</button>
+    </form>
+    <h1>אשרות כניסה</h1>
+    {% for table in tables %}
+        {{ table|safe }}
+    {% endfor %}
+   
+
+
+
+    <!-- <form action="/download_pdf" method="post">
+        <button id="downloadpdfBtn" type="submit">Download as PDF</button>
+    </form> -->
+    <button id="addEntryBtn" onclick="toggleForm()">Add Entry</button>
+
+        <!-- Other form fields go here -->
+
+    </form>
+
+    <h1>חיפוש הרשאות כניסה:</h1>
     
-    <h1>Permissions Table</h1>
-    {% if permissions_table %}
-        {{ permissions_table|safe }}
-    {% else %}
-        <p>No permissions data available.</p>
+    <!-- Form with asynchronous submission -->
+    <form id="checkPermissionForm">
+        <label for="id_number">Enter ID Number:</label>
+        <input type="text" id="id_number" name="id_number" required>
+        <button type="submit">Check Permission</button>
+    </form>
+
+    <!-- Container to display the result -->
+    <div id="resultContainer"></div>
+
+
+    <form id="addEntryForm" method="post" action="/add_entry">
+        
+        <label for="customer_name">לקוח:</label>
+        <select id="customer_name" name="customer_name">
+            {% for customer_name in unique_clients %}
+                <option value="{{ customer_name }}" {% if customer_name == selected_customer %}selected{% endif %}>{{ customer_name }}</option>
+            {% endfor %}
+        </select>
+        <form action="/" method="get">
+        </br>
+        <label for="location">בחר אתר:</label>
+        <select id="location" name="location">
+            {% for location in atarim %}
+                <option value="{{ location }}" {% if location == selected_location %}selected{% endif %}>{{ location }}</option>
+            {% endfor %}
+        </select>
+        </br>
+        <label for="issue_type">סמן סוג תקלה:</label>
+        <select id="issue_type" name="issue_type">
+            {% for issue_type in unique_issues %}
+                <option value="{{ issue_type }}" {% if issue_type == selected_issue_type %}selected{% endif %}>{{ issue_type }}</option>
+            {% endfor %}
+        </select>
+        </br>
+        <input type="text" name="serial_number" placeholder="מספר סידורי">
+        <input type="text" name="date_time" placeholder="תאריך +שעה">
+        <input type="text" name="description" placeholder="תיאור">
+        <input type="text" name="report_to" placeholder="דווח ל...">
+        <input type="text" name="call_number" placeholder="מס' קריאה">
+        <input type="text" name="treatment_completion" placeholder="סיום טיפול (סגירה)">
+        <input type="text" name="notes" placeholder="הערות">
+        <input type="text" name="event_closed_by" placeholder="מי סגר את האירוע">
+        </br>
+        </br>
+        <button type="submit">Add</button>
+    </form>
+
+
+    {% if result %}
+        {% if result.has_permission %}
+            <h2>Entrance Permission Found</h2>
+            <p>Details:</p>
+            <ul>
+                <li><strong>מספר סידורי:</strong> {{ result.details['מספר סידורי'] }}</li>
+                <li><strong>שם לקוח:</strong> {{ result.details['שם לקוח'] }}</li>
+                <!-- Add other details as needed -->
+            </ul>
+        {% else %}
+            <p>No entrance permission found for the given ID.</p>
+        {% endif %}
     {% endif %}
 
-    <h1>Passwords Table</h1>
-    {% if passwords_table %}
-        {{ passwords_table|safe }}
-    {% else %}
-        <p>No permissions data available.</p>
-    {% endif %}
+    <script>
+        function toggleForm() {
+            var form = document.getElementById("addEntryForm");
+            form.style.display = form.style.display === "none" ? "block" : "none";
+        }
+    </script>
 </body>
 </html>
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>רשימת תקלות</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        #downloadBtn {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>רשימת תקלות</h1>
+    {% for table in tables %}
+        {{ table|safe }}
+    {% endfor %}
+    
+    <form action="/download" method="post">
+        <button id="downloadBtn" type="submit">Download Table</button>
+    </form>
+
+    
+</body>
+</html> -->

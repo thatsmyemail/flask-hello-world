@@ -9,8 +9,15 @@
 <body>
     <h2>Welcome, {{ username }}!</h2>
     <p>Your role: {{ session['role'] }}</p>
-    <h3>Data based on your role:</h3>
-    {{ data | safe }}
+    <p>Client name: {{ session['Client'] }}</p>
+    <p>Your permissions: {{ data3 | safe }}</p>
+    <!-- <h3>Relevant Permissions:</h3>
+    {{ data3 | safe }} -->
+   <h3>Permissions:</h3>
+    {{ data1 | safe }}
+    <h3>Passwords:</h3>
+    {{ data2 | safe }}
+
     <br>
     <a href="{{ url_for('logout') }}">Logout</a>
 </body>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Entrance Permission</title>
+</head>
+<body>
+    <h1>Check Entrance Permission</h1>
+    <form method="post" action="/check_permission">
+        <label for="id_number">Enter ID Number:</label>
+        <input type="text" id="id_number" name="id_number" required>
+        <button type="submit">Check Permission</button>
+    </form>
+
+    {% if result %}
+        {% if result.has_permission %}
+            <h2>Entrance Permission Found</h2>
+            <p>Details:</p>
+            <ul>
+                <li><strong>מספר סידורי:</strong> {{ result.details['מספר סידורי'] }}</li>
+                <li><strong>שם לקוח:</strong> {{ result.details['שם לקוח'] }}</li>
+                <!-- Add other details as needed -->
+            </ul>
+        {% else %}
+            <p>No entrance permission found for the given ID.</p>
+        {% endif %}
+    {% endif %}
+</body>
+</html>

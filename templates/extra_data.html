@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permissions Data</title>
+</head>
+<body>
+    <h1>Permissions</h1>
+    {% if extra_data_table %}
+    <title>Manageddd Permissions</title>
+    {{ extra_data_table|safe }}
+{% else %}
+    <p>No permissions data available.</p>
+{% endif %}
+
+<h1>Users</h1>
+{% if extra_data_table2 %}
+<title>Manageddd Permissions</title>
+{{ extra_data_table2|safe }}
+{% else %}
+<p>No permissions data available.</p>
+{% endif %}
+</body>
+</html>
