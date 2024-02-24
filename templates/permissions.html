@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Permissions</title>
+</head>
+<body>
+    
+    <h1>Permissions Table</h1>
+    {% if permissions_table %}
+        {{ permissions_table|safe }}
+    {% else %}
+        <p>No permissions data available.</p>
+    {% endif %}
+
+    <h1>Passwords Table</h1>
+    {% if passwords_table %}
+        {{ passwords_table|safe }}
+    {% else %}
+        <p>No permissions data available.</p>
+    {% endif %}
+</body>
+</html>

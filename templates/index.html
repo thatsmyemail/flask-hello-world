@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Table</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        #downloadBtn, #addEntryBtn {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #addEntryForm {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <form action="/" method="get">
+        <label for="issue">Select Issue Type:</label>
+        <select name="issue" id="issue">
+            <option value="">All Issues</option>
+            {% for issue in unique_issues %}
+                <option value="{{ issue }}" {% if issue == selected_issue %}selected{% endif %}>{{ issue }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="timeframe">Select Timeframe:</label>
+        <select name="timeframe" id="timeframe">
+            <option value="">All Timeframes</option>
+            {% for timeframe in unique_timeframes %}
+                <option value="{{ timeframe }}" {% if timeframe == selected_timeframe %}selected{% endif %}>{{ timeframe }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Apply Filters</button>
+    </form>
+    <h1>Data Table</h1>
+    {% for table in tables %}
+        {{ table|safe }}
+    {% endfor %}
+    
+    <form action="/download" method="post">
+        <button id="downloadBtn" type="submit">Download Table</button>
+    </form>
+    <form action="/download_pdf" method="post">
+        <button id="downloadBtn" type="submit">Download as PDF</button>
+    </form>
+    <!-- <form action="/download_pdf" method="post">
+        <button id="downloadpdfBtn" type="submit">Download as PDF</button>
+    </form> -->
+    <button id="addEntryBtn" onclick="toggleForm()">Add Entry</button>
+<!-- Add the button to manage permissions -->
+<form action="/manage_permissions" method="get">
+    <button type="submit">Manage Permissions</button>
+</form>
+
+
+    <form id="addEntryForm" method="post" action="/add_entry">
+        <input type="text" name="serial_number" placeholder="מספר סידורי">
+        <input type="text" name="customer_name" placeholder="שם לקוח">
+        <input type="text" name="date_time" placeholder="תאריך +שעה">
+        <input type="text" name="location" placeholder="אתר">
+        <input type="text" name="issue_type" placeholder="סוג תקלה">
+        <input type="text" name="description" placeholder="תיאור">
+        <input type="text" name="report_to" placeholder="דווח ל...">
+        <input type="text" name="call_number" placeholder="מס' קריאה">
+        <input type="text" name="treatment_completion" placeholder="סיום טיפול (סגירה)">
+        <input type="text" name="notes" placeholder="הערות">
+        <input type="text" name="event_closed_by" placeholder="מי סגר את האירוע">
+        <button type="submit">Add</button>
+    </form>
+    
+
+    <script>
+        function toggleForm() {
+            var form = document.getElementById("addEntryForm");
+            form.style.display = form.style.display === "none" ? "block" : "none";
+        }
+    </script>
+</body>
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Table</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        #downloadBtn {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Data Table</h1>
+    {% for table in tables %}
+        {{ table|safe }}
+    {% endfor %}
+    
+    <form action="/download" method="post">
+        <button id="downloadBtn" type="submit">Download Table</button>
+    </form>
+</body>
+</html> -->
